@@ -15,6 +15,55 @@
 
 package eliona
 
-//
-// Todo: Define anything for eliona like writing assets or heap data
-//
+import (
+	"context"
+	"encoding/json"
+
+	"stopwatch/conn"
+
+	api "github.com/eliona-smart-building-assistant/go-eliona-api-client/v2"
+	"github.com/eliona-smart-building-assistant/go-eliona/client"
+	"github.com/eliona-smart-building-assistant/go-utils/log"
+)
+
+const (
+	MODULE             = "eliClient"
+	RX_BUFFER          = 20000
+	WEBSOCKET_ENDPOINT = "/data-listener"
+)
+
+func GetStopwatches() ([]api.Asset, error) {
+	var stopwatches []api.Asset
+
+	assets, resp, err := client.NewClient().AssetsApi.GetAssets(context.Background()).Execute()
+
+	log.Debug(MODULE, "get stopwatches response: %v", resp)
+
+	for _, asset := range assets {
+		if asset.AssetType == "Stopwatch" {
+			stopwatches = append(stopwatches, asset)
+		}
+	}
+	return stopwatches, err
+}
+
+func ListenHeapEvents(ir <-chan bool, rxApiData chan<- api.Data) {
+	var (
+		rx chan []byte
+	)
+
+	rx = make(chan []byte, RX_BUFFER)
+
+	ws := conn.NewWebsocketClient(client.ApiEndpointString()+WEBSOCKET_ENDPOINT, false)
+	go ws.ServeForever(rx, ir)
+	for data := range rx {
+		var apiData api.Data
+		err := json.Unmarshal(data, &apiData)
+		if err == nil {
+			rxApiData <- apiData
+		} else {
+			log.Warn(MODULE, "cannot unmarshal ws data", err)
+		}
+	}
+	log.Warn(MODULE, "rx channel from ws closed")
+}

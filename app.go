@@ -16,20 +16,55 @@
 package main
 
 import (
+	"net/http"
+	"stopwatch/apiserver"
+	"stopwatch/apiservices"
+	"stopwatch/eliona"
+
+	api "github.com/eliona-smart-building-assistant/go-eliona-api-client/v2"
 	"github.com/eliona-smart-building-assistant/go-utils/common"
 	"github.com/eliona-smart-building-assistant/go-utils/log"
-	"hailo/apiserver"
-	"hailo/apiservices"
-	"net/http"
+)
+
+const (
+	MODULE          = "app"
+	API_DATA_BUFFER = 20000
+)
+
+var (
+	stopwatches []api.Asset
+	ir          chan bool
 )
 
 // doAnything is the main app function which is called periodically
-func doAnything() {
+func actualizeStopwatches() {
+	var err error
 
-	//
-	// Todo: implement everything the app should do
-	//
+	stopwatches, err = eliona.GetStopwatches()
+	log.Debug(MODULE, "got stopwatches %v with err %v", stopwatches, err)
+}
 
+func setupApp() {
+	log.Info(MODULE, "setup application")
+
+	var (
+		apiData chan api.Data
+	)
+
+	ir = make(chan bool)
+	apiData = make(chan api.Data, API_DATA_BUFFER)
+
+	actualizeStopwatches()
+
+	go eliona.ListenHeapEvents(ir, apiData)
+	go stopwatchEventCatcher(apiData)
+}
+
+func stopwatchEventCatcher(apiData <-chan api.Data) {
+	for data := range apiData {
+		log.Debug(MODULE, "data from datalistener: %v", data)
+	}
+	log.Warn(MODULE, "eventcatcher exited")
 }
 
 // listenApiRequests starts an API server and listen for API requests

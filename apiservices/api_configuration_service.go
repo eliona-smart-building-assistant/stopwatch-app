@@ -12,8 +12,8 @@ package apiservices
 import (
 	"context"
 	"errors"
-	"hailo/apiserver"
 	"net/http"
+	"stopwatch/apiserver"
 )
 
 // ConfigurationApiService is a service that implements the logic for the ConfigurationApiServicer
