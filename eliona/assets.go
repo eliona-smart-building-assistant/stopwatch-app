@@ -30,7 +30,20 @@ const (
 	MODULE             = "eliClient"
 	RX_BUFFER          = 20000
 	WEBSOCKET_ENDPOINT = "/data-listener"
+	// asset definitons
+	ASSET_TYPE_STOPWATCH   = "Stopwatch"
+	ATTRIBUTE_START        = "start"
+	ATTRIBUTE_STOP         = "stop"
+	ATTRIBUTE_CURRENT_TIME = "current_time"
+	ATTRIBUTE_LAST_TIME    = "last_time"
+	SUBTYPE_ACTIONS        = api.SUBTYPE_OUTPUT
+	SUBTYPE_VALUES         = api.SUBTYPE_INPUT
 )
+
+type StopwatchValueData struct {
+	CurrentTime *int32 `json:"current_time,omitempty"`
+	LastTime    *int32 `json:"last_time,omitempty"`
+}
 
 func GetStopwatches() ([]api.Asset, error) {
 	var stopwatches []api.Asset
@@ -40,11 +53,47 @@ func GetStopwatches() ([]api.Asset, error) {
 	log.Debug(MODULE, "get stopwatches response: %v", resp)
 
 	for _, asset := range assets {
-		if asset.AssetType == "Stopwatch" {
+		if asset.AssetType == ASSET_TYPE_STOPWATCH {
 			stopwatches = append(stopwatches, asset)
 		}
 	}
 	return stopwatches, err
+}
+
+func UpdateTime(assetId int32, newTime float64) error {
+
+	dataData := make(map[string]interface{})
+	dataData[ATTRIBUTE_CURRENT_TIME] = newTime
+
+	data := api.Data{
+		AssetId: assetId,
+		Subtype: SUBTYPE_VALUES,
+		// Timestamp:     *api.NewNullableTime(nil),
+		Data: dataData,
+	}
+	resp, err := client.NewClient().DataApi.PutData(context.Background()).Data(data).Execute()
+
+	log.Debug(MODULE, "get current time response: %v", resp)
+
+	return err
+}
+
+func UpdateLastTime(assetId int32, newTime float64) error {
+
+	dataData := make(map[string]interface{})
+	dataData[ATTRIBUTE_LAST_TIME] = newTime
+
+	data := api.Data{
+		AssetId: assetId,
+		Subtype: SUBTYPE_VALUES,
+		// Timestamp:     *api.NewNullableTime(nil),
+		Data: dataData,
+	}
+	resp, err := client.NewClient().DataApi.PutData(context.Background()).Data(data).Execute()
+
+	log.Debug(MODULE, "get last time response: %v", resp)
+
+	return err
 }
 
 func ListenHeapEvents(ir <-chan bool, rxApiData chan<- api.Data) {
@@ -60,7 +109,10 @@ func ListenHeapEvents(ir <-chan bool, rxApiData chan<- api.Data) {
 		var apiData api.Data
 		err := json.Unmarshal(data, &apiData)
 		if err == nil {
-			rxApiData <- apiData
+			// prefilter data
+			if apiData.Subtype == SUBTYPE_ACTIONS {
+				rxApiData <- apiData
+			}
 		} else {
 			log.Warn(MODULE, "cannot unmarshal ws data", err)
 		}
