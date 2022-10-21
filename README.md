@@ -47,6 +47,10 @@ This app provides a start and a stop input (Button) to start or stop the stopwat
 
 ## Tools
 
+### Testing ###
+
+The code can be tested by running `go test`
+
 ### Generate API server stub ###
 
 For the API server the [OpenAPI Generator](https://openapi-generator.tech/docs/generators/openapi-yaml) for go-server is used to generate a server stub. The easiest way to generate the server files is to use one of the predefined generation script which use the OpenAPI Generator Docker image.
