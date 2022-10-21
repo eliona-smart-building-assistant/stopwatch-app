@@ -39,8 +39,8 @@ func TestStopwatchManager(t *testing.T) {
 
 	t.Log("stop timer 1")
 	timeF := swMng.Stop(1)
-	if !InToleranceOneSec(2, count1, countTot, int32(timeF.Seconds())) {
-		t.Error("final time doesn't match")
+	if !InTolerance(2, count1, countTot, int32(timeF.Seconds())) {
+		t.Error("final time timer 1 doesn't match")
 	}
 
 	count1 = 0
@@ -53,20 +53,24 @@ func TestStopwatchManager(t *testing.T) {
 	time.Sleep(3 * time.Second)
 
 	tS := swMng.Stop(5).Seconds()
-	if !InToleranceOneSec(countTot, 3*3) || !InToleranceOneSec(3, count5, int32(tS)) {
-		t.Error("timer 3 endtime not match", tS, count5, countTot)
+	if !InTolerance(1, 3, count5, int32(tS)) {
+		t.Error("timer 5 endtime not match")
 	}
 
 	time.Sleep(3 * time.Second)
 	tS = swMng.Stop(1).Seconds()
-	if !InToleranceOneSec(6, int32(tS), count1) || !InToleranceOneSec(3*3+2*3, countTot) {
-		t.Error("timer 1 endtime not match", tS)
+	if !InTolerance(1, 6, int32(tS), count1) {
+		t.Error("timer 3 endtime not match")
 	}
 
 	time.Sleep(4 * time.Second)
 	tS = swMng.Stop(4553).Seconds()
-	if !InToleranceOneSec(10, int32(tS), count4553) || !InToleranceOneSec(3*3+2*3+4, countTot) {
-		t.Error("timer 4553 endtime not match", tS)
+	if !InTolerance(1, 10, int32(tS), count4553) {
+		t.Error("timer 4553 endtime not match")
+	}
+
+	if !InTolerance(2, 3*3+2*3+4, countTot) {
+		t.Error("tot not in tolerance")
 	}
 
 	swMng.Start(1234)
@@ -89,9 +93,10 @@ func stopwatchCallback(id int32, time time.Duration) {
 	}
 }
 
-func InToleranceOneSec(should int32, is ...int32) bool {
-	for _, c := range is {
-		if should-1 > c || c > should+1 {
+func InTolerance(tolerance int32, should int32, is ...int32) bool {
+	for i, c := range is {
+		if should-tolerance > c || c > should+tolerance {
+			log.Error("test", "not in tolerance[%d]: should %d, is %d", i, should, is)
 			return false
 		}
 	}
