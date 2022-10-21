@@ -22,7 +22,7 @@ import (
 	"github.com/eliona-smart-building-assistant/go-utils/log"
 )
 
-const SMODULE = "Stopwatch"
+const MODULE = "Stopwatch"
 
 type SwCallback func(id int32, time time.Duration)
 
@@ -57,6 +57,7 @@ func (swM *StopwatchManager) Start(id int32) {
 	sw, _ := swM.getStopwatch(id)
 	if sw == nil {
 		sw = swM.createNewStopwatch(id)
+		log.Debug(MODULE, "new stopwatch created. %d", id)
 	}
 
 	if !sw.running {
@@ -75,7 +76,7 @@ func (swM *StopwatchManager) Stop(id int32) time.Duration {
 
 	if sw != nil {
 		if sw.IsRunning() {
-			log.Debug(SMODULE, "timer %d stopped", sw.Id)
+			log.Debug(MODULE, "timer %d stopped", sw.Id)
 			sw.Stop()
 		}
 
@@ -83,7 +84,7 @@ func (swM *StopwatchManager) Stop(id int32) time.Duration {
 
 		swM.deleteStopwatch(index)
 	} else {
-		log.Debug(SMODULE, "timer to stop is nil")
+		log.Debug(MODULE, "timer to stop is nil")
 	}
 	return lasttime
 }
@@ -93,7 +94,7 @@ func (swM *StopwatchManager) StopAll() {
 	defer swM.lock.Unlock()
 
 	for _, sw := range swM.stopwatches {
-		log.Debug(SMODULE, "stop all %d", sw.Id)
+		log.Debug(MODULE, "stop all %d", sw.Id)
 		sw.Stop()
 	}
 	swM.wg.Wait()
@@ -140,11 +141,12 @@ func (sw *Stopwatch) runner(wg *sync.WaitGroup, clbk SwCallback) {
 	defer wg.Done()
 	defer sw.setStopped()
 
+	log.Debug(MODULE, "stopwatch runner %d started [clbk: %v]", sw.Id, clbk)
 	for {
 		select {
 		case <-sw.ir:
-			log.Debug(SMODULE, "ticker interrupted")
-			return
+			log.Debug(MODULE, "ticker %d interrupted", sw.Id)
+			goto exit
 		case _, ok := <-sw.ticker.C:
 			if ok {
 				sw.time += time.Second
@@ -152,16 +154,19 @@ func (sw *Stopwatch) runner(wg *sync.WaitGroup, clbk SwCallback) {
 					clbk(sw.Id, sw.time)
 				}
 			} else {
-				log.Debug(SMODULE, "sw ticker not ok")
-				return
+				log.Debug(MODULE, "sw ticker %d not ok", sw.Id)
+				goto exit
 			}
 		}
 	}
+exit:
+	log.Debug(MODULE, "stopwatch runner %d exiting", sw.Id)
 }
 
 func (sw *Stopwatch) Stop() {
 	sw.ticker.Stop()
 	sw.ir <- true
+	log.Debug(MODULE, "stopping stopwatch %d...", sw.Id)
 }
 
 func (sw *Stopwatch) GetTime() time.Duration {

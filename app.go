@@ -39,7 +39,6 @@ var (
 	swMng       stopwtch.StopwatchManager
 )
 
-// doAnything is the main app function which is called periodically
 func actualizeStopwatches() {
 	var err error
 
@@ -72,21 +71,29 @@ func stopwatchEventCatcher(apiData <-chan api.Data) {
 
 		asset := getStopwatchByAssetId(data.AssetId)
 		if asset != nil {
-			start := data.Data[eliona.ATTRIBUTE_START]
-			stop := data.Data[eliona.ATTRIBUTE_STOP]
-			if stop != nil && stop.(float64) >= 1 {
-				lastTime := swMng.Stop(asset.GetId())
-				if lastTime.Seconds() > 0 {
-					log.Info(MODULE, "timer stoppend %d @ %d s", asset.GetId(), lastTime.Seconds())
-					eliona.UpdateLastTime(data.AssetId, lastTime.Seconds())
-				}
-			} else if start != nil && start.(float64) >= 1 {
-				log.Info(MODULE, "timer started %d", asset.GetId())
-				swMng.Start(asset.GetId())
-			}
+			processStartStopEvent(data.AssetId, data.Data)
 		}
 	}
 	log.Warn(MODULE, "eventcatcher exited")
+}
+
+func processStartStopEvent(assetId int32, data map[string]interface{}) {
+	start := data[eliona.ATTRIBUTE_START]
+	stop := data[eliona.ATTRIBUTE_STOP]
+
+	// prioritize stop signal
+	if stop != nil && stop.(float64) >= 1 {
+		lastTime := swMng.Stop(assetId)
+		if lastTime.Seconds() > 0 {
+			log.Info(MODULE, "timer stoppend %d @ %f s",
+				assetId,
+				lastTime.Seconds())
+			eliona.UpdateLastTime(assetId, lastTime.Seconds())
+		}
+	} else if start != nil && start.(float64) >= 1 {
+		log.Info(MODULE, "timer started %d", assetId)
+		swMng.Start(assetId)
+	}
 }
 
 // stopwatch ticks
@@ -111,5 +118,5 @@ func listenApiRequests() {
 	err := http.ListenAndServe(":"+common.Getenv("API_SERVER_PORT", "3000"), apiserver.NewRouter(
 		apiserver.NewConfigurationApiController(apiservices.NewConfigurationApiService()),
 	))
-	log.Fatal("Hailo", "Error in API Server: %v", err)
+	log.Fatal(MODULE, "Error in API Server: %v", err)
 }

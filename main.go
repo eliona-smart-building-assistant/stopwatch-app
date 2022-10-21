@@ -18,6 +18,8 @@ package main
 import (
 	"time"
 
+	"github.com/eliona-smart-building-assistant/go-eliona/app"
+	"github.com/eliona-smart-building-assistant/go-eliona/asset"
 	"github.com/eliona-smart-building-assistant/go-utils/common"
 	"github.com/eliona-smart-building-assistant/go-utils/db"
 	"github.com/eliona-smart-building-assistant/go-utils/log"
@@ -31,12 +33,11 @@ func main() {
 	// Necessary to close used init resources, because db.Pool() is used in this app.
 	defer db.ClosePool()
 
-	// // Init the app before the first run.
-	// app.Init(db.Pool(), app.AppName(),
-	// 	app.ExecSqlFile("conf/init.sql"),
-	// 	conf.InitConfiguration,
-	// 	eliona.InitEliona,
-	// )
+	// Init the app before the first run.
+	app.Init(db.Pool(), app.AppName(),
+		app.ExecSqlFile("conf/init.sql"),
+		asset.InitAssetTypeFile("eliona/asset-type-stopwatch.json"),
+	)
 
 	setupApp()
 

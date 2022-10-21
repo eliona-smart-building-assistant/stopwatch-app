@@ -14,7 +14,3 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 create schema if not exists stopwatch;
-
---
--- Todo: create tables and database objects necessary for this app like tables persisting configuration
---
