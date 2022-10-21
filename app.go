@@ -116,7 +116,7 @@ func getStopwatchByAssetId(assetId int32) *api.Asset {
 // The API endpoints are defined in the openapi.yaml file
 func listenApiRequests() {
 	err := http.ListenAndServe(":"+common.Getenv("API_SERVER_PORT", "3000"), apiserver.NewRouter(
-		apiserver.NewConfigurationApiController(apiservices.NewConfigurationApiService()),
+		apiserver.NewUtilsApiController(apiservices.NewUtilsApiService()),
 	))
 	log.Fatal(MODULE, "Error in API Server: %v", err)
 }
