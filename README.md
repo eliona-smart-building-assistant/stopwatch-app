@@ -1,3 +1,4 @@
+![go-test-workflow](https://github.com/ChrIgiSta/stopwatch/workflows/test.yaml/badge.svg)
 # App 
 This app enables stopwatch functionality for eliona.
 
