@@ -25,10 +25,10 @@ import (
 )
 
 var (
-	count1    int
-	count5    int
-	count4553 int
-	countTot  int
+	count1    int32
+	count5    int32
+	count4553 int32
+	countTot  int32
 )
 
 func TestStopwatchManager(t *testing.T) {
@@ -39,7 +39,7 @@ func TestStopwatchManager(t *testing.T) {
 
 	t.Log("stop timer 1")
 	timeF := swMng.Stop(1)
-	if timeF.Seconds() != 2 || count1 != 2 || countTot != 2 {
+	if !InToleranceOneSec(2, count1, countTot, int32(timeF.Seconds())) {
 		t.Error("final time doesn't match")
 	}
 
@@ -53,19 +53,19 @@ func TestStopwatchManager(t *testing.T) {
 	time.Sleep(3 * time.Second)
 
 	tS := swMng.Stop(5).Seconds()
-	if tS != 3 || count5 != 3 || countTot != 3*3 {
+	if !InToleranceOneSec(countTot, 3*3) || !InToleranceOneSec(3, count5, int32(tS)) {
 		t.Error("timer 3 endtime not match", tS, count5, countTot)
 	}
 
 	time.Sleep(3 * time.Second)
 	tS = swMng.Stop(1).Seconds()
-	if tS != 6 || count1 != 6 || countTot != 3*3+2*3 {
+	if !InToleranceOneSec(6, int32(tS), count1) || !InToleranceOneSec(3*3+2*3, countTot) {
 		t.Error("timer 1 endtime not match", tS)
 	}
 
 	time.Sleep(4 * time.Second)
 	tS = swMng.Stop(4553).Seconds()
-	if tS != 10 || count4553 != 10 || countTot != 3*3+2*3+4 {
+	if !InToleranceOneSec(10, int32(tS), count4553) || !InToleranceOneSec(3*3+2*3+4, countTot) {
 		t.Error("timer 4553 endtime not match", tS)
 	}
 
@@ -87,4 +87,13 @@ func stopwatchCallback(id int32, time time.Duration) {
 	} else if id == 4553 {
 		count4553++
 	}
+}
+
+func InToleranceOneSec(should int32, is ...int32) bool {
+	for _, c := range is {
+		if should-1 > c || c > should+1 {
+			return false
+		}
+	}
+	return true
 }
