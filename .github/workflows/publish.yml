@@ -26,5 +26,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: chrigista/stopwatch-app:latest
-
+          tags: eliona/stopwatch-app:latest
