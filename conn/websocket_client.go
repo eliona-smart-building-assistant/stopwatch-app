@@ -18,7 +18,9 @@ package conn
 import (
 	"crypto/tls"
 	"flag"
+	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -36,9 +38,13 @@ type WebsocketClient struct {
 
 func createUrl(websocketUrl string) url.URL {
 	var (
-		path  string
-		query string
+		path   string
+		query  string
+		scheme string = "wss"
 	)
+	if strings.Contains(websocketUrl, "ws://") || strings.Contains(websocketUrl, "http://") {
+		scheme = "ws"
+	}
 	websocketUrl = strings.ReplaceAll(websocketUrl, "ws://", "")
 	websocketUrl = strings.ReplaceAll(websocketUrl, "wss://", "")
 	websocketUrl = strings.ReplaceAll(websocketUrl, "http://", "")
@@ -54,7 +60,7 @@ func createUrl(websocketUrl string) url.URL {
 
 	var addr = flag.String("addr", domain, "wss address")
 
-	return url.URL{Scheme: "wss", Host: *addr, Path: path, RawQuery: query}
+	return url.URL{Scheme: scheme, Host: *addr, Path: path, RawQuery: query}
 }
 
 func NewWebsocketClient(websocketUrl string, skipVerifyCertificate bool) *WebsocketClient {
@@ -66,13 +72,17 @@ func NewWebsocketClient(websocketUrl string, skipVerifyCertificate bool) *Websoc
 
 func (ws *WebsocketClient) ServeForever(rxChannel chan<- []byte, interrupt <-chan bool) {
 	var err error
+	var requestHeader http.Header = http.Header{}
 
 	log.Info(MODULE, "connecting to %s", ws.url.String())
 
-	tlsConfig := tls.Config{InsecureSkipVerify: ws.IgnoreCert}
-	websocket.DefaultDialer.TLSClientConfig = &tlsConfig
+	if ws.url.Scheme == "wss" {
+		tlsConfig := tls.Config{InsecureSkipVerify: ws.IgnoreCert}
+		websocket.DefaultDialer.TLSClientConfig = &tlsConfig
+	}
+	requestHeader.Add("X-API-Key", os.Getenv("API_TOKEN"))
 
-	ws.conn, _, err = websocket.DefaultDialer.Dial(ws.url.String(), nil)
+	ws.conn, _, err = websocket.DefaultDialer.Dial(ws.url.String(), requestHeader)
 	if err != nil {
 		log.Error(MODULE, "wss dial", err)
 	}

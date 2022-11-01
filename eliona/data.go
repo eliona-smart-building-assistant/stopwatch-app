@@ -16,7 +16,6 @@
 package eliona
 
 import (
-	"context"
 	"encoding/json"
 	"stopwatch/conn"
 
@@ -48,7 +47,7 @@ func UpdateTime(assetId int32, newTime float64) error {
 		// Timestamp:     *api.NewNullableTime(nil),
 		Data: dataData,
 	}
-	resp, err := client.NewClient().DataApi.PutData(context.Background()).Data(data).Execute()
+	resp, err := client.NewClient().DataApi.PutData(client.AuthenticationContext()).Data(data).Execute()
 
 	log.Debug(MODULE, "get current time response: %v", resp)
 
@@ -66,7 +65,7 @@ func UpdateLastTime(assetId int32, newTime float64) error {
 		// Timestamp:     *api.NewNullableTime(nil),
 		Data: dataData,
 	}
-	resp, err := client.NewClient().DataApi.PutData(context.Background()).Data(data).Execute()
+	resp, err := client.NewClient().DataApi.PutData(client.AuthenticationContext()).Data(data).Execute()
 
 	log.Debug(MODULE, "get last time response: %v", resp)
 

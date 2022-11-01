@@ -73,6 +73,17 @@ func setupApp() {
 	go catchAndExitOnOsSig()
 }
 
+func fatalTimeout(seconds int) *time.Timer {
+	timeout := time.NewTimer(time.Duration(seconds) * time.Second)
+
+	go func() {
+		<-timeout.C
+		log.Fatal("main", "Fatal Timeout")
+	}()
+
+	return timeout
+}
+
 func catchAndExitOnOsSig() {
 	osSig := make(chan os.Signal, 1)
 	signal.Notify(osSig,
@@ -83,6 +94,10 @@ func catchAndExitOnOsSig() {
 
 	<-osSig
 	osIr = true
+
+	ft := fatalTimeout(60)
+	defer ft.Stop()
+
 	log.Info("app", "Os Signal catched, exiting...")
 	ir <- true
 	swMng.StopAll()

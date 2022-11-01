@@ -16,8 +16,6 @@
 package eliona
 
 import (
-	"context"
-
 	api "github.com/eliona-smart-building-assistant/go-eliona-api-client/v2"
 	"github.com/eliona-smart-building-assistant/go-eliona/client"
 	"github.com/eliona-smart-building-assistant/go-utils/log"
@@ -37,7 +35,7 @@ type StopwatchValueData struct {
 func GetStopwatches() ([]api.Asset, error) {
 	var stopwatches []api.Asset
 
-	assets, resp, err := client.NewClient().AssetsApi.GetAssets(context.Background()).Execute()
+	assets, resp, err := client.NewClient().AssetsApi.GetAssets(client.AuthenticationContext()).Execute()
 
 	log.Debug(MODULE, "get stopwatches response: %v", resp)
 
