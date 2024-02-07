@@ -1,0 +1,12 @@
+{
+    "name": "stopwatch",
+    "description": {
+        "de": "Stoppuhrfunktion",
+        "en": "Stopwatch functionality"
+    },
+    "displayName": {
+        "de": "Stoppuhr",
+        "en": "Stopwatch"
+    },
+    "useEnvironment": []
+}
