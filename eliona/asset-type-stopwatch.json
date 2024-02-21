@@ -27,7 +27,6 @@
 			"name": "start",
 			"min": 0,
 			"max": 1,
-			"step": 1,
 			"subtype": "output",
 			"translation": {
 				"de": "Start",
@@ -40,7 +39,6 @@
 			"name": "stop",
 			"min": 0,
 			"max": 1,
-			"step": 1,
 			"subtype": "output",
 			"translation": {
 				"de": "Stopp",

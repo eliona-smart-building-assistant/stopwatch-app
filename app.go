@@ -17,6 +17,9 @@ package main
 
 import (
 	"context"
+	"github.com/eliona-smart-building-assistant/go-eliona/app"
+	"github.com/eliona-smart-building-assistant/go-eliona/asset"
+	"github.com/eliona-smart-building-assistant/go-utils/db"
 	"net/http"
 	"os"
 	"os/signal"
@@ -44,6 +47,20 @@ var (
 	apiServer   *http.Server
 	osIr        bool
 )
+
+func initialization() {
+	ctx := context.Background()
+
+	// Necessary to close used init resources
+	conn := db.NewInitConnectionWithContextAndApplicationName(ctx, app.AppName())
+	defer conn.Close(ctx)
+
+	// Init the app before the first run.
+	app.Init(db.Pool(), app.AppName(),
+		app.ExecSqlFile("conf/init.sql"),
+		asset.InitAssetTypeFile("eliona/asset-type-stopwatch.json"),
+	)
+}
 
 func actualizeStopwatches() {
 	var err error

@@ -35,7 +35,7 @@ type StopwatchValueData struct {
 func GetStopwatches() ([]api.Asset, error) {
 	var stopwatches []api.Asset
 
-	assets, resp, err := client.NewClient().AssetsApi.GetAssets(client.AuthenticationContext()).Execute()
+	assets, resp, err := client.NewClient().AssetsAPI.GetAssets(client.AuthenticationContext()).Execute()
 
 	log.Debug(MODULE, "get stopwatches response: %v", resp)
 

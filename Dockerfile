@@ -26,8 +26,8 @@ FROM alpine:3.15 AS target
 COPY --from=build /app ./
 COPY conf/*.sql ./conf/
 COPY eliona/*.json ./eliona/
-
-ENV APPNAME=stopwatch
+COPY openapi.yaml ./
+COPY metadata.json ./
 
 ENV TZ=Europe/Zurich
 CMD [ "/app" ]

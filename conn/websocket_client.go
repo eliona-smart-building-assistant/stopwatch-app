@@ -84,7 +84,7 @@ func (ws *WebsocketClient) ServeForever(rxChannel chan<- []byte, interrupt <-cha
 
 	ws.conn, _, err = websocket.DefaultDialer.Dial(ws.url.String(), requestHeader)
 	if err != nil {
-		log.Error(MODULE, "wss dial", err)
+		log.Error(MODULE, "wss dial: %v", err)
 	}
 
 	defer ws.conn.Close()
@@ -103,7 +103,7 @@ func (ws *WebsocketClient) ServeForever(rxChannel chan<- []byte, interrupt <-cha
 			err = ws.conn.WriteMessage(websocket.CloseMessage,
 				websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
-				log.Info(MODULE, "write close", err)
+				log.Info(MODULE, "write close: %v", err)
 			}
 			// wait for wssReaderLoop
 			select {
@@ -121,7 +121,7 @@ func (ws *WebsocketClient) readerLoop(rxChannel chan<- []byte, closed chan<- boo
 	for {
 		_, message, err := ws.conn.ReadMessage()
 		if err != nil {
-			log.Error(MODULE, "read message", err)
+			log.Error(MODULE, "read message: %v", err)
 			return
 		}
 		rxChannel <- message
@@ -131,7 +131,7 @@ func (ws *WebsocketClient) readerLoop(rxChannel chan<- []byte, closed chan<- boo
 func (ws *WebsocketClient) Send(message []byte) error {
 	err := ws.conn.WriteMessage(websocket.TextMessage, message)
 	if err != nil {
-		log.Error(MODULE, "send message", err)
+		log.Error(MODULE, "send message: %v", err)
 	}
 	return err
 }
