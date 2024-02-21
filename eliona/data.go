@@ -47,7 +47,7 @@ func UpdateTime(assetId int32, newTime float64) error {
 		// Timestamp:     *api.NewNullableTime(nil),
 		Data: dataData,
 	}
-	resp, err := client.NewClient().DataApi.PutData(client.AuthenticationContext()).Data(data).Execute()
+	resp, err := client.NewClient().DataAPI.PutData(client.AuthenticationContext()).Data(data).Execute()
 
 	log.Debug(MODULE, "get current time response: %v", resp)
 
@@ -65,7 +65,7 @@ func UpdateLastTime(assetId int32, newTime float64) error {
 		// Timestamp:     *api.NewNullableTime(nil),
 		Data: dataData,
 	}
-	resp, err := client.NewClient().DataApi.PutData(client.AuthenticationContext()).Data(data).Execute()
+	resp, err := client.NewClient().DataAPI.PutData(client.AuthenticationContext()).Data(data).Execute()
 
 	log.Debug(MODULE, "get last time response: %v", resp)
 
@@ -91,7 +91,7 @@ func ListenHeapEvents(ir <-chan bool, rxApiData chan<- api.Data) {
 				rxApiData <- apiData
 			}
 		} else {
-			log.Warn(MODULE, "cannot unmarshal ws data", err)
+			log.Warn(MODULE, "cannot unmarshal ws data: %v", err)
 		}
 	}
 	log.Warn(MODULE, "rx channel from ws closed. exiting event listener...")
