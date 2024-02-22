@@ -56,7 +56,7 @@ func initialization() {
 	defer conn.Close(ctx)
 
 	// Init the app before the first run.
-	app.Init(db.Pool(), app.AppName(),
+	app.Init(conn, app.AppName(),
 		app.ExecSqlFile("conf/init.sql"),
 		asset.InitAssetTypeFile("eliona/asset-type-stopwatch.json"),
 	)
