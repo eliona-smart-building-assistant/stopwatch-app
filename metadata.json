@@ -9,6 +9,7 @@
         "de": "Stoppuhr",
         "en": "Stopwatch"
     },
+    "documentationUrl": "https://doc.eliona.io/collection/v/eliona-english/eliona-apps/apps/stopwatch",
     "useEnvironment": [
         "CONNECTION_STRING",
         "INIT_CONNECTION_STRING",
