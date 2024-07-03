@@ -1,7 +1,7 @@
 ![go-build](https://github.com/eliona-smart-building-assistant/stopwatch-app/actions/workflows/build.yml/badge.svg) ![go-test](https://github.com/eliona-smart-building-assistant/stopwatch-app/actions/workflows/ci.yml/badge.svg)
 
 # Stopwatch App 
-This app enables stopwatch functionality for eliona.
+This app enables stopwatch functionality for Eliona.
 
 ![SmartView Picture not fould](eliona/example_stopwatch_view.png?raw=true "SmartView with stopwatch")
 
