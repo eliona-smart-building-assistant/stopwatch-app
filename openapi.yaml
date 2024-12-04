@@ -20,8 +20,8 @@ info:
   title: App Stopwatch API
   description: API to access and configure the app stopwatch
 externalDocs:
-  description: Find out more about the app stopwatch
-  url: https://github.com/eliona-smart-building-assistant/stopwatch
+  description: Find out more about the Stopwatch app
+  url: https://doc.eliona.io/collection/eliona-english/eliona-apps/apps/stopwatch
 servers:
   - url: http://stopwatch/v1
 
@@ -45,7 +45,7 @@ paths:
           content:
             application/json:
               schema:
-                  $ref: '#/components/schemas/Status'
+                $ref: "#/components/schemas/Status"
 
 components:
   schemas:

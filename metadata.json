@@ -1,6 +1,6 @@
 {
     "name": "stopwatch",
-    "elionaMinVersion": "v11.0.0",    
+    "elionaMinVersion": "v11.0.0",
     "description": {
         "de": "Stoppuhr-Funktion",
         "en": "Stopwatch functionality"
@@ -9,7 +9,7 @@
         "de": "Stoppuhr",
         "en": "Stopwatch"
     },
-    "documentationUrl": "https://doc.eliona.io/collection/v/eliona-english/eliona-apps/apps/stopwatch",
+    "documentationUrl": "https://doc.eliona.io/collection/eliona-english/eliona-apps/apps/stopwatch",
     "useEnvironment": [
         "CONNECTION_STRING",
         "INIT_CONNECTION_STRING",
